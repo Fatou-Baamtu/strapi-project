@@ -1,0 +1,62 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tasks",
+  "info": {
+    "singularName": "task",
+    "pluralName": "tasks",
+    "displayName": "Tasks"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "description": {
+      "type": "text"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "taskDate": {
+      "type": "datetime",
+      "required": true
+    },
+    "reminderDate": {
+      "type": "datetime"
+    },
+    "notificationOffset": {
+      "type": "integer"
+    },
+    "imageUri": {
+      "type": "text"
+    },
+    "audioUri": {
+      "type": "text"
+    },
+    "location": {
+      "type": "json"
+    },
+    "transcription": {
+      "type": "text"
+    },
+    "userId": {
+      "type": "string",
+      "required": true
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag",
+      "mappedBy": "tasks"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pending-notifications",
+  "info": {
+    "singularName": "pending-notification",
+    "pluralName": "pending-notifications",
+    "displayName": "Pending Notification"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": false
+    }
+  },
+  "attributes": {
+    "taskId": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "body": {
+      "type": "text"
+    },
+    "notifyAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "userId": {
+      "type": "string",
+      "required": true
+    },
+    "delivered": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

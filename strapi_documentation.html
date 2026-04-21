@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Complète de Strapi</title>
+    <style>
+        :root {
+            --primary: #4945FF;
+            --primary-light: #7B79FF;
+            --dark: #212134;
+            --text-main: #32324D;
+            --text-muted: #8E8EA9;
+            --bg-light: #F6F6F9;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(33, 33, 52, 0.05);
+        }
+
+        h2 {
+            color: var(--dark);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+
+        h3 {
+            color: var(--primary);
+            margin-top: 1.5rem;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-card {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .concept-card h4 {
+            margin-top: 0;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        code {
+            background-color: #EAEAFF;
+            color: #271FE0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .architecture {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .arch-box {
+            flex: 1;
+            background: var(--primary-light);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .architecture {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Comprendre Strapi</h1>
+        <p>Le CMS Headless Open-Source basé sur Node.js</p>
+    </header>
+
+    <div class="container">
+        <section id="introduction">
+            <h2>1. Qu'est-ce que Strapi ?</h2>
+            <p><strong>Strapi</strong> est un CMS (Content Management System) dit "Headless". Contrairement à un CMS traditionnel comme WordPress, Strapi ne gère pas l'affichage final (le front-end). Il se concentre uniquement sur la gestion du contenu (back-office) et expose ce contenu via des API (REST et GraphQL) pour qu'il puisse être consommé par n'importe quel client (site web React/Vue/Angular, application mobile Flutter/React Native, objets connectés, etc.).</p>
+            
+            <h3>Pourquoi l'utiliser ?</h3>
+            <ul>
+                <li><strong>Gains de temps :</strong> Crée des API performantes en quelques clics sans écrire de code de routage complexe.</li>
+                <li><strong>Agnostique au Front-end :</strong> Utilise ta technologie préférée (Next.js, Flutter, etc.) pour créer l'interface utilisateur.</li>
+                <li><strong>Hautement personnalisable :</strong> Basé sur Node.js, son code source est accessible et modifiable.</li>
+            </ul>
+        </section>
+
+        <section id="technologies">
+            <h2>2. Technologies Utilisées par Strapi</h2>
+            <p>Strapi est construit sur une stack JavaScript/TypeScript moderne :</p>
+            <ul>
+                <li><strong>Back-end (Serveur) :</strong> <code>Node.js</code> avec le framework <code>Koa.js</code> (qui gère les requêtes HTTP).</li>
+                <li><strong>Front-end (Panel d'administration) :</strong> Construit avec <code>React.js</code>.</li>
+                <li><strong>Base de données :</strong> Strapi utilise un ORM puissant pour se connecter à diverses bases de données. Il supporte : <code>PostgreSQL</code>, <code>MySQL</code>, <code>MariaDB</code> et <code>SQLite</code>.</li>
+            </ul>
+
+            <div class="architecture">
+                <div class="arch-box">Panel Admin (React)</div>
+                <div class="arch-box">API (Node.js/Koa)</div>
+                <div class="arch-box">Base de données (SQL)</div>
+            </div>
+        </section>
+
+        <section id="core-concepts">
+            <h2>3. Les Concepts Fondamentaux (Le Cœur de Strapi)</h2>
+            <p>Pour maîtriser Strapi, il faut comprendre comment il structure les données :</p>
+
+            <div class="concept-card">
+                <h4>A. Content-Types Builder (Le Constructeur de Modèles)</h4>
+                <p>C'est l'interface où tu définis la structure de ta base de données sans écrire de SQL. Tu y crées des "modèles" de contenu.</p>
+            </div>
+
+            <div class="concept-card">
+                <h4>B. Collection Types (Types de Collection)</h4>
+                <p>Utilisés pour les données répétitives. Exemple : Des <em>Articles</em>, des <em>Produits</em>, des <em>Utilisateurs</em>. Si tu as besoin d'une liste de contenus, c'est un Collection Type.</p>
+            </div>
+
+            <div class="concept-card">
+                <h4>C. Single Types (Types Uniques)</h4>
+                <p>Utilisés pour les données uniques qui n'existent qu'en un seul exemplaire. Exemple : La page <em>"À propos"</em>, le <em>"Menu de navigation principal"</em>, les <em>"Paramètres SEO globaux"</em>.</p>
+            </div>
+
+            <div class="concept-card">
+                <h4>D. Components (Composants)</h4>
+                <p>Ce sont des structures de données réutilisables. Exemple : Un composant <em>"Bouton"</em> (contenant un lien et un texte) ou un composant <em>"Section Hero"</em> (titre, image intro). Tu peux inclure ces composants dans tes Collection ou Single Types.</p>
+            </div>
+
+            <div class="concept-card">
+                <h4>E. Dynamic Zones (Zones Dynamiques)</h4>
+                <p>C'est la fonctionnalité la plus puissante pour les créateurs de contenu. Une "Dynamic Zone" permet à l'administrateur d'insérer différents composants dans l'ordre qu'il souhaite (par exemple, construire un article avec un paragraphe, puis une image, puis un carrousel, etc.).</p>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>4. Fonctionnalités Clés</h2>
+
+            <h3>A. API REST et GraphQL</h3>
+            <p>Dès que tu crées un Collection Type (ex: "Article"), Strapi génère automatiquement les routes d'API :</p>
+            <ul>
+                <li><code>GET /api/articles</code> (Lister)</li>
+                <li><code>GET /api/articles/:id</code> (Récupérer un)</li>
+                <li><code>POST /api/articles</code> (Créer)</li>
+                <li><code>PUT /api/articles/:id</code> (Modifier)</li>
+                <li><code>DELETE /api/articles/:id</code> (Supprimer)</li>
+            </ul>
+
+            <h3>B. Roles & Permissions (RBAC)</h3>
+            <p>Strapi possède un système très fin de gestion des droits :</p>
+            <ul>
+                <li><strong>Public :</strong> Ce que les utilisateurs non connectés peuvent voir (ex: lire les articles).</li>
+                <li><strong>Authenticated :</strong> Ce que les utilisateurs connectés peuvent faire (ex: laisser un commentaire).</li>
+                <li><strong>Admin Roles :</strong> Contrôle précis de ce que les éditeurs, auteurs et super-admins peuvent faire dans le panneau d'administration.</li>
+            </ul>
+
+            <h3>C. Media Library (Médiathèque)</h3>
+            <p>Interface pour uploader, modifier (recadrer) et optimiser les images, vidéos et fichiers. Il supporte les "Providers" externes (ex: Cloudinary, AWS S3) pour stocker les fichiers dans le cloud plutôt que sur le serveur.</p>
+
+            <h3>D. Webhooks</h3>
+            <p>Strapi peut avertir le monde extérieur d'un changement. Exemple : À chaque fois qu'un article est publié, Strapi envoie une requête (Webhook) à Vercel ou Netlify pour reconstruire ton site web statique.</p>
+        </section>
+
+        <section id="dev-workflow">
+            <h2>5. Comment fonctionne un projet Strapi (Cycle de vie)</h2>
+            <ol>
+                <li><strong>Développement local :</strong> L'architecte de données lance Strapi en local (<code>npm run develop</code>), crée les Content-Types. Strapi génère automatiquement du code (fichiers JSON) représentant ces schémas dans le dossier <code>/src/api</code>.</li>
+                <li><strong>Commit :</strong> Ces fichiers schémas (fichiers de code) sont commités sur Git. (Note : Le contenu créé n'est pas versionné par Git, il reste dans la base de données).</li>
+                <li><strong>Déploiement :</strong> Le code est déployé sur un serveur de production (ex: Render, AWS, Heroku). Strapi lit les fichiers schémas et met à jour la base de données de production en conséquence.</li>
+                <li><strong>Gestion de Contenu :</strong> Les rédacteurs se connectent au panel admin en production pour créer les textes et ajouter des images.</li>
+                <li><strong>Consommation :</strong> L'application mobile (ex: ton app Flutter) ou le site web interroge l'API Strapi de production pour afficher les données.</li>
+            </ol>
+        </section>
+
+        <section id="customization">
+            <h2>6. Personnalisation Avancée (Pour les Devs)</h2>
+            <p>Strapi n'est pas qu'une simple interface, c'est un framework Node.js :</p>
+            <ul>
+                <li><strong>Controllers :</strong> Tu peux surcharger les contrôleurs par défaut pour modifier la logique lorsqu'une requête arrive à l'API.</li>
+                <li><strong>Services :</strong> Contient la logique métier réutilisable de ton application.</li>
+                <li><strong>Middlewares :</strong> Fonctions qui s'exécutent avant d'atteindre le contrôleur (ex: pour vérifier un token personnalisé).</li>
+                <li><strong>Lifecycles (Hooks) :</strong> Permet d'exécuter du code à des moments précis (ex: <code>beforeCreate</code> pour hasher un mot de passe avant insertion, ou <code>afterDelete</code> pour nettoyer des fichiers associés).</li>
+                <li><strong>Plugins :</strong> Tu peux étendre Strapi avec des plugins de la communauté (SEO, Export import, etc.) ou développer tes propres plugins React/Node.</li>
+            </ul>
+        </section>
+    </div>
+
+</body>
+</html>
