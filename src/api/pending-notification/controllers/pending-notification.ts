@@ -42,5 +42,24 @@ export default factories.createCoreController(uid, ({ strapi }) => ({
 
     return ctx.send({ success: true });
   },
+  async myDue(ctx) {
+  const user = ctx.state.user;
+  if (!user) return ctx.unauthorized('Non authentifié');
+
+  const now = new Date().toISOString();
+  const uid = 'api::pending-notification.pending-notification';
+
+  const results = await strapi.db.query(uid).findMany({
+    where: {
+      userId: String(user.id),
+      delivered: false,
+      notifyAt: { $lte: now }, // <= maintenant = prête
+    },
+    orderBy: { notifyAt: 'asc' },
+  });
+
+  return ctx.send({ data: results });
+},
+
 
 }));

@@ -12,5 +12,11 @@ export default {
       handler: 'pending-notification.markDelivered',
       config: { policies: [], middlewares: [] },
     },
+    {
+    method: 'GET',
+    path: '/my-due-notifications',
+    handler: 'pending-notification.myDue',
+    config: { policies: [], middlewares: [] },
+},
   ],
 };
