@@ -57,6 +57,16 @@
       "relation": "manyToMany",
       "target": "api::tag.tag",
       "mappedBy": "tasks"
+    },
+    "statut": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pending",
+      "enum": [
+        "pending",
+        "inProgress",
+        "completed"
+      ]
     }
   }
 }

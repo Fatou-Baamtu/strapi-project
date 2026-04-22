@@ -565,6 +565,11 @@ export interface ApiTaskTask extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     reminderDate: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
+    statut: Schema.Attribute.Enumeration<
+      ['pending', 'inProgress', 'completed']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
     tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
     taskDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
     title: Schema.Attribute.String & Schema.Attribute.Required;
