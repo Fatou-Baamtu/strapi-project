@@ -1,57 +1,68 @@
 export default {
   async afterCreate(event) {
-    await upsertPendingNotification(event.result);
+    const task = event.result;
+
+    if (!task || !task.documentId) return;
+
+    strapi.log.info(`🧠 TASK CREATED documentId=${task.documentId} id=${task.id} locale=${task.locale} publishedAt=${task.publishedAt}`);
+  
+    await upsertPendingNotification(task);
   },
   async afterUpdate(event) {
     await upsertPendingNotification(event.result);
   },
   async afterDelete(event) {
-    await deletePendingNotification(String(event.result.id));
+    if (event.result && event.result.documentId) {
+      strapi.log.info(`🗑️ TASK DELETED ${event.result.documentId}`);
+      await deletePendingNotification(String(event.result.documentId));
+    }
   },
 };
 
 async function upsertPendingNotification(task: any) {
-  if (!task?.id) return;
+  if (!task?.documentId) return;
 
-  const taskId = String(task.id);
-  const completed = task.completed ?? false;
-  const reminderDate = task.reminderDate ?? null;
-  const taskDate = task.taskDate ?? null;
-  const notificationOffset = task.notificationOffset ?? null;
+  try {
+    const uid = 'api::pending-notification.pending-notification';
+    const taskIdString = String(task.documentId); // Use documentId instead of id
 
-  let notifyAt: string | null = null;
+    if (task.completed) {
+      await strapi.db.query(uid).deleteMany({ where: { taskId: taskIdString } });
+      return;
+    }
 
-  if (reminderDate) {
-    notifyAt = new Date(reminderDate).toISOString();
-  } else if (taskDate && notificationOffset != null) {
-    const d = new Date(taskDate);
-    d.setMinutes(d.getMinutes() - notificationOffset);
-    notifyAt = d.toISOString();
-  }
+    const taskDate = task.taskDate ? new Date(task.taskDate) : new Date();
+    const offset = task.notificationOffset ?? 0;
 
-  if (!notifyAt || completed || new Date(notifyAt) < new Date()) {
-    await deletePendingNotification(taskId);
-    return;
-  }
+    const notifyAt = new Date(taskDate);
+    if (!isNaN(notifyAt.getTime())) {
+      notifyAt.setMinutes(notifyAt.getMinutes() - offset);
+    }
 
-  const uid = 'api::pending-notification.pending-notification';
-  const existing = await strapi.db.query(uid).findOne({ where: { taskId } });
+    const payload = {
+      taskId: taskIdString,
+      userId: task.userId ? String(task.userId) : 'system',
+      title: task.title ?? 'Rappel',
+      body: task.description?.substring(0, 120) ?? '',
+      notifyAt: isNaN(notifyAt.getTime()) ? new Date().toISOString() : notifyAt.toISOString(),
+      delivered: false,
+      publishedAt: new Date().toISOString(),
+    };
 
-  const payload = {
-    taskId,
-    title: task.title ?? 'Rappel',
-    body: task.description
-      ? String(task.description).substring(0, 100)
-      : `Tâche prévue pour ${new Date(taskDate).toLocaleString('fr')}`,
-    notifyAt,
-    userId: String(task.userId ?? ''),
-    delivered: false,
-  };
+    const existing = await strapi.db.query(uid).findOne({
+      where: { taskId: taskIdString },
+    });
 
-  if (existing) {
-    await strapi.db.query(uid).update({ where: { id: existing.id }, data: payload });
-  } else {
-    await strapi.db.query(uid).create({ data: payload });
+    if (existing) {
+      await strapi.db.query(uid).update({
+        where: { id: existing.id },
+        data: payload,
+      });
+    } else {
+      await strapi.db.query(uid).create({ data: payload });
+    }
+  } catch (error) {
+    strapi.log.error(`❌ Error in upsertPendingNotification: ${error.message}`);
   }
 }
 

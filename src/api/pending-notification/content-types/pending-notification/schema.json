@@ -41,6 +41,13 @@
     "delivered": {
       "type": "boolean",
       "default": false
+    },
+    "attempts": {
+      "type": "integer",
+      "default": 0
+    },
+    "lastError": {
+      "type": "text"
     }
   }
 }

@@ -484,11 +484,13 @@ export interface ApiPendingNotificationPendingNotification
     };
   };
   attributes: {
+    attempts: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     body: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     delivered: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    lastError: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
