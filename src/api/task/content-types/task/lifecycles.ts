@@ -4,36 +4,45 @@ export default {
 
     if (!task || !task.documentId) return;
 
-    strapi.log.info(`🧠 TASK CREATED documentId=${task.documentId} id=${task.id} locale=${task.locale} publishedAt=${task.publishedAt}`);
-  
+    strapi.log.info(`🧠 [Task Lifecycle] afterCreate: docId=${task.documentId}, id=${task.id}, publishedAt=${task.publishedAt}`);
     await upsertPendingNotification(task);
   },
+
   async afterUpdate(event) {
-    await upsertPendingNotification(event.result);
+    const task = event.result;
+    if (!task || !task.documentId) return;
+    
+    strapi.log.info(`🧠 [Task Lifecycle] afterUpdate: docId=${task.documentId}`);
+    await upsertPendingNotification(task);
   },
+
   async afterDelete(event) {
-    if (event.result && event.result.documentId) {
-      strapi.log.info(`🗑️ TASK DELETED ${event.result.documentId}`);
-      await deletePendingNotification(String(event.result.documentId));
+    const task = event.result;
+    if (task && task.documentId) {
+      strapi.log.info(`🗑️ [Task Lifecycle] afterDelete: docId=${task.documentId}`);
+      await deletePendingNotification(task.documentId);
     }
   },
 };
 
 async function upsertPendingNotification(task: any) {
-  if (!task?.documentId) return;
+  const uid = 'api::pending-notification.pending-notification';
+  const taskIdString = String(task.documentId);
 
   try {
-    const uid = 'api::pending-notification.pending-notification';
-    const taskIdString = String(task.documentId); // Use documentId instead of id
-
+    // 1. Check if task is completed
     if (task.completed) {
-      await strapi.db.query(uid).deleteMany({ where: { taskId: taskIdString } });
+      const existing = await strapi.documents(uid).findFirst({
+        filters: { taskId: taskIdString }
+      });
+      if (existing) {
+        await strapi.documents(uid).delete({ documentId: existing.documentId });
+      }
       return;
     }
 
     const taskDate = task.taskDate ? new Date(task.taskDate) : new Date();
     const offset = task.notificationOffset ?? 0;
-
     const notifyAt = new Date(taskDate);
     if (!isNaN(notifyAt.getTime())) {
       notifyAt.setMinutes(notifyAt.getMinutes() - offset);
@@ -46,32 +55,42 @@ async function upsertPendingNotification(task: any) {
       body: task.description?.substring(0, 120) ?? '',
       notifyAt: isNaN(notifyAt.getTime()) ? new Date().toISOString() : notifyAt.toISOString(),
       delivered: false,
-      publishedAt: new Date().toISOString(),
     };
 
-    const existing = await strapi.db.query(uid).findOne({
-      where: { taskId: taskIdString },
+    // 3. Find Existing Notification linked to this task document
+    const existing = await strapi.documents(uid).findFirst({
+      filters: { taskId: taskIdString }
     });
 
     if (existing) {
-      await strapi.db.query(uid).update({
-        where: { id: existing.id },
+      strapi.log.info(`🔄 Updating notification for task ${taskIdString}`);
+      await strapi.documents(uid).update({
+        documentId: existing.documentId,
         data: payload,
+        status: 'published'
       });
     } else {
-      await strapi.db.query(uid).create({ data: payload });
+      strapi.log.info(`✨ Creating new notification for task ${taskIdString}`);
+      await strapi.documents(uid).create({
+        data: payload,
+        status: 'published'
+      });
     }
   } catch (error) {
     strapi.log.error(`❌ Error in upsertPendingNotification: ${error.message}`);
   }
 }
 
-async function deletePendingNotification(taskId: string) {
+async function deletePendingNotification(taskDocumentId: string) {
   try {
     const uid = 'api::pending-notification.pending-notification';
-    const existing = await strapi.db.query(uid).findOne({ where: { taskId } });
+    const existing = await strapi.documents(uid).findFirst({
+      filters: { taskId: taskDocumentId }
+    });
     if (existing) {
-      await strapi.db.query(uid).delete({ where: { id: existing.id } });
+      await strapi.documents(uid).delete({ documentId: existing.documentId });
     }
-  } catch (_) {}
+  } catch (error) {
+    strapi.log.error(`❌ Error in deletePendingNotification: ${error.message}`);
+  }
 }
